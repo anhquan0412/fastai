@@ -340,6 +340,11 @@ class TensorBase(Tensor):
         res = self.as_subclass(Tensor).new() if x is None else self.as_subclass(Tensor).new(x)
         return res.as_subclass(cls)
 
+    def requires_grad_(self):
+        # Workaround https://github.com/pytorch/pytorch/issues/50219
+        self.requires_grad = True
+        return self
+
 # Cell
 class TensorImageBase(TensorBase):
     _show_args = ArrayImageBase._show_args
@@ -362,7 +367,7 @@ class TensorMask(TensorImageBase):
         return super().show(ctx=ctx, **kwargs)
 
 # Cell
-for o in Tensor.add,Tensor.sub,Tensor.mul,Tensor.div,Tensor.__rsub__,Tensor.__radd__,Tensor.matmul,Tensor.bmm:
+for o in Tensor.__ne__,Tensor.__eq__,Tensor.add,Tensor.sub,Tensor.mul,Tensor.div,Tensor.__rsub__,Tensor.__radd__,Tensor.matmul,Tensor.bmm:
     TensorBase.register_func(o, TensorMask, TensorImageBase)
     TensorBase.register_func(o, TensorImageBase, TensorMask)
 
