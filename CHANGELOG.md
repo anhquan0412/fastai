@@ -2,6 +2,19 @@
 
 <!-- do not remove -->
 
+
+## 2.2.3
+
+### New Features
+
+- Calculate correct `nf` in `create_head` based on `concat_pool` ([#3115](https://github.com/fastai/fastai/pull/3115)), thanks to [@muellerzr](https://github.com/muellerzr)
+
+### Bugs Squashed
+
+- wandb integration failing with latest wandb library ([#3066](https://github.com/fastai/fastai/issues/3066))
+- `Learner.load` and `LRFinder` not functioning properly for the optimizer states ([#2892](https://github.com/fastai/fastai/issues/2892))
+
+
 ## 2.2.2
 
 ### Bugs Squashed
@@ -248,5 +261,4 @@ The next version of fastai will be 2.1. It will require PyTorch 1.7, which has s
 ## Version 2.0.0
 
 - Initial release of v2
-
 
