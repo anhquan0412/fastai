@@ -107,13 +107,13 @@ class HookCallback(Callback):
     "`Callback` that can be used to register hooks on `modules`"
     _methods = ["hook"]
     hook = noops
-    def __init__(self, modules=None, every=None, remove_end=True, is_forward=True, detach=True, cpu=True, **kwargs):
-        store_attr('modules,every,remove_end,is_forward,detach,cpu')
+    def __init__(self, modules=None, every=None, remove_end=True, is_forward=True, detach=True, cpu=True, include_paramless=False , **kwargs):
+        store_attr('modules,every,remove_end,is_forward,detach,cpu, include_paramless')
         assert not kwargs
 
     def before_fit(self):
         "Register the `Hooks` on `self.modules`."
-        if self.modules is None: self.modules = [m for m in flatten_model(self.model) if has_params(m)]
+        if self.modules is None: self.modules = [m for m in flatten_model(self.model) if self.include_paramless or has_params(m)]
         if self.every is None: self._register()
 
     def before_batch(self):
@@ -147,9 +147,9 @@ def layer_info(learn, *xb):
     def _track(m, i, o):
         params, trainable, shape = '', '', ''
         same = any((isinstance(x[0], torch.Tensor) and x[0].shape[1:] == x[1].shape for x in zip(i, o)))
+        shape = apply(lambda x: x.shape, o)
         if hasattr(m, 'weight'): # non activation layer
             params, trainable = total_params(m)
-            shape = apply(lambda x: x.shape, o)
         return (type(m).__name__, params, trainable, shape, same)
 
     with Hooks(flatten_model(learn.model), _track) as h:
@@ -160,8 +160,13 @@ def layer_info(learn, *xb):
         return h.stored
 
 # Cell
+def _get_shapes(o, bs):
+    inp = o[first(o)] if (isinstance(o, dict)) else o
+    return ' x '.join([str(bs)] + [str(t) for t in inp[1:]])
+
 def _print_shapes(o, bs):
-    if isinstance(o, (torch.Size,tuple)): return ' x '.join([str(bs)] + [str(t) for t in o[1:]])
+    if isinstance(o, torch.Size): return _get_shapes(o, bs)
+    elif isinstance(o, tuple): return _get_shapes(o[0], bs)
     else: return str([_print_shapes(x, bs) for x in o])
 
 # Cell
