@@ -242,7 +242,9 @@ class Learner(GetAttr):
         else:
             try: len(dl)
             except TypeError as e:
-                raise TypeError("`dl` is something other than a single `DataLoader` object")
+                raise TypeError(f"`dl` is {type(dl)} and doesn't have len(dl)")
+        if isinstance(dl, DataLoader):
+            if dl.drop_last: dl = dl.new(shuffle=False, drop_last=False)
         if reorder and hasattr(dl, 'get_idxs'):
             idxs = dl.get_idxs()
             dl = dl.new(get_idxs = _ConstantFunc(idxs))
@@ -276,7 +278,7 @@ class Learner(GetAttr):
         if dl is None: dl = self.dls[ds_idx].new(shuffle=shuffle)
         b = dl.one_batch()
         _,_,preds = self.get_preds(dl=[b], with_decoded=True)
-        self.dls.show_results(b, preds, max_n=max_n, **kwargs)
+        dl.show_results(b, preds, max_n=max_n, **kwargs)
 
     def show_training_loop(self):
         indent = 0
@@ -382,8 +384,10 @@ def load_learner(fname, cpu=True, pickle_module=pickle):
     "Load a `Learner` object in `fname`, optionally putting it on the `cpu`"
     distrib_barrier()
     res = torch.load(fname, map_location='cpu' if cpu else None, pickle_module=pickle_module)
-    if hasattr(res, 'to_fp32'): res = res.to_fp32()
-    if cpu: res.dls.cpu()
+    if cpu:
+        res.dls.cpu()
+        if hasattr(res, 'mixed_precision'): res = res.to_fp32()
+        elif hasattr(res, 'non_native_mixed_precision'): res = res.to_non_native_fp32()
     return res
 
 # Cell
@@ -542,7 +546,8 @@ class Recorder(Callback):
         plt.plot(list(range(skip_start, len(self.losses))), self.losses[skip_start:], label='train')
         if with_valid:
             idx = (np.array(self.iters)<skip_start).sum()
-            plt.plot(self.iters[idx:], L(self.values[idx:]).itemgot(1), label='valid')
+            valid_col = self.metric_names.index('valid_loss') - 1
+            plt.plot(self.iters[idx:], L(self.values[idx:]).itemgot(valid_col), label='valid')
             plt.legend()
 
 # Cell
