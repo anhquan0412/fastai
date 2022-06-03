@@ -16,6 +16,7 @@
         "empty1": {
             "Intermediate": {
                 "DataBlock Tutorial": "/tutorial.datablock.html",
+                "Distributed Training from a Notebook Tutorial":"/tutorial.distributed",
                 "Imagenette Tutorial": "/tutorial.imagenette.html",
                 "Medical Imaging Tutorial": "/tutorial.medical_imaging.html",
                 "Pets Tutorial": "/tutorial.pets.html",
@@ -118,7 +119,9 @@
         "Captum": "/callback.captum.html",
         "Weights & Biases": "/callback.wandb.html",
         "Neptune": "/callback.neptune.html",
-        "TensorBoard": "/callback.tensorboard.html"
+        "Comet": "/callback.comet.html",
+        "TensorBoard": "/callback.tensorboard.html",
+        "Hugging Face Hub": "/huggingface.html"
     },
     "fastai Development": {
         "Developers Guide": "/dev-setup.html",
