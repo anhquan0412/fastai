@@ -4,10 +4,8 @@
 from __future__ import annotations
 
 
-__all__ = ['CancelBackwardException', 'CancelStepException', 'CancelFitException', 'CancelEpochException',
-           'CancelTrainException', 'CancelValidException', 'CancelBatchException', 'replacing_yield', 'mk_metric',
-           'save_model', 'load_model', 'SkipToEpoch', 'Learner', 'before_batch_cb', 'load_learner', 'Metric',
-           'AvgMetric', 'AvgLoss', 'AvgSmoothLoss', 'ValueMetric', 'Recorder']
+__all__ = ['replacing_yield', 'mk_metric', 'save_model', 'load_model', 'SkipToEpoch', 'Learner', 'before_batch_cb',
+           'load_learner', 'Metric', 'AvgMetric', 'AvgLoss', 'AvgSmoothLoss', 'ValueMetric', 'Recorder', 'CastToTensor']
 
 # Cell
 #nbdev_comment from __future__ import annotations
@@ -17,7 +15,8 @@ from .callback.core import *
 import pickle,threading
 
 # Cell
-#nbdev_comment _all_ = ['CancelBackwardException', 'CancelStepException','CancelFitException','CancelEpochException','CancelTrainException','CancelValidException','CancelBatchException']
+_all_ = ['CancelBackwardException', 'CancelStepException','CancelFitException','CancelEpochException',
+         'CancelTrainException','CancelValidException','CancelBatchException']
 
 # Cell
 defaults.lr = 1e-3
@@ -580,6 +579,22 @@ add_docs(Recorder,
          plot_loss = "Plot the losses from `skip_start` and onward")
 
 if Recorder not in defaults.callbacks: defaults.callbacks.append(Recorder)
+
+# Internal Cell
+def _cast_tensor(x):
+    if isinstance(x, tuple): return tuple(_cast_tensor(x_) for x_ in x)
+    else: return cast(x, Tensor) if isinstance(x,torch.Tensor) else x
+
+# Cell
+class CastToTensor(Callback):
+    "Cast Subclassed Tensors to `Tensor`"
+    order=9 # Right before MixedPrecision
+
+    def before_batch(self):
+        self.learn.xb,self.learn.yb = _cast_tensor(self.learn.xb),_cast_tensor(self.learn.yb)
+
+# Cell
+if CastToTensor not in defaults.callbacks: defaults.callbacks.append(CastToTensor)
 
 # Cell
 @patch
