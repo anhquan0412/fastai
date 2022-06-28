@@ -46,7 +46,6 @@ def save_model(file, model, opt, with_opt=True, pickle_protocol=2):
 # Cell
 def load_model(file, model, opt, with_opt=True, device=None, strict=True):
     "Load `model` from `file` along with `opt` (if available, and if `with_opt`)"
-    distrib_barrier()
     if isinstance(device, int): device = torch.device('cuda', device)
     elif device is None: device = 'cpu'
     state = torch.load(file, map_location=device)
@@ -274,12 +273,12 @@ class Learner(GetAttr):
         if with_loss: ctx_mgrs.append(self.loss_not_reduced())
         with ContextManagers(ctx_mgrs):
             self._do_epoch_validate(dl=dl)
-            if act is None: act = getattr(self.loss_func, 'activation', noop)
+            if act is None: act = getcallable(self.loss_func, 'activation')
             res = cb.all_tensors()
             pred_i = 1 if with_input else 0
             if res[pred_i] is not None:
                 res[pred_i] = act(res[pred_i])
-                if with_decoded: res.insert(pred_i+2, getattr(self.loss_func, 'decodes', noop)(res[pred_i]))
+                if with_decoded: res.insert(pred_i+2, getcallable(self.loss_func, 'decodes')(res[pred_i]))
             if reorder and hasattr(dl, 'get_idxs'): res = nested_reorder(res, tensor(idxs).argsort())
             return tuple(res)
         self._end_cleanup()
@@ -385,6 +384,7 @@ def load(self:Learner, file, device=None, **kwargs):
     if self.opt is None: self.create_opt()
     file = join_path_file(file, self.path/self.model_dir, ext='.pth')
     load_model(file, self.model, self.opt, device=device, **kwargs)
+    nested_attr(self, "accelerator.wait_for_everyone", noop)()
     return self
 
 # Cell
