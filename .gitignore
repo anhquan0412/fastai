@@ -1,3 +1,5 @@
+_proc/
+.gitattributes
 Gemfile.lock
 collect_env.py
 tmp*
@@ -5,7 +7,6 @@ Untitled*.ipynb
 *.bak
 token
 .idea/
-docs/
 conda/
 tmp/
 
@@ -123,3 +124,5 @@ venv.bak/
 
 # Mac stuff
 .DS_Store
+_docs/
+

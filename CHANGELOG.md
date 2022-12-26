@@ -2,6 +2,115 @@
 
 <!-- do not remove -->
 
+## 2.7.10
+
+### New Features
+
+- Add torch save and load kwargs ([#3831](https://github.com/fastai/fastai/pull/3831)), thanks to [@JonathanGrant](https://github.com/JonathanGrant)
+  - This lets us do nice things like set pickle_module to cloudpickle
+- PyTorch 1.13 Compatibility ([#3828](https://github.com/fastai/fastai/pull/3828)), thanks to [@warner-benjamin](https://github.com/warner-benjamin)
+- Recursive copying of attribute dictionaries for TensorImage subclass ([#3822](https://github.com/fastai/fastai/pull/3822)), thanks to [@restlessronin](https://github.com/restlessronin)
+- `OptimWrapper` sets same param groups as `Optimizer` ([#3821](https://github.com/fastai/fastai/pull/3821)), thanks to [@warner-benjamin](https://github.com/warner-benjamin)
+  - This PR harmonizes the default parameter group setting between `OptimWrapper` and `Optimizer` by modifying `OptimWrapper` to match `Optimizer`'s logic.
+- Support normalization of 1-channel images in unet ([#3820](https://github.com/fastai/fastai/pull/3820)), thanks to [@marib00](https://github.com/marib00)
+- Add `img_cls` param to `ImageDataLoaders` ([#3808](https://github.com/fastai/fastai/pull/3808)), thanks to [@tcapelle](https://github.com/tcapelle)
+  - This is particularly useful for passing `PILImageBW` for MNIST.
+- Add support for `kwargs` to `tensor()` when arg is an `ndarray` ([#3797](https://github.com/fastai/fastai/pull/3797)), thanks to [@SaadAhmedGit](https://github.com/SaadAhmedGit)
+- Add latest TorchVision models on fastai ([#3791](https://github.com/fastai/fastai/pull/3791)), thanks to [@datumbox](https://github.com/datumbox)
+- Option to preserve filenames in `download_images` ([#2983](https://github.com/fastai/fastai/pull/2983)), thanks to [@mess-lelouch](https://github.com/mess-lelouch)
+
+### Bugs Squashed
+
+- `get_text_classifier` fails with custom `AWS_LSTM` ([#3817](https://github.com/fastai/fastai/issues/3817))
+- revert auto-enable of mac mps due to pytorch limitations ([#3769](https://github.com/fastai/fastai/issues/3769))
+- Workaround for performance bug in PyTorch with subclassed tensors ([#3683](https://github.com/fastai/fastai/pull/3683)), thanks to [@warner-benjamin](https://github.com/warner-benjamin)
+
+
+## 2.7.8
+
+### New Features
+
+- add split value argument to ColSplitter ([#3737](https://github.com/fastai/fastai/pull/3737)), thanks to [@DanteOz](https://github.com/DanteOz)
+- deterministic repr for PIL images ([#3762](https://github.com/fastai/fastai/issues/3762))
+- option to skip default callbacks in `Learner` ([#3739](https://github.com/fastai/fastai/issues/3739))
+- update for nbdev2 ([#3747](https://github.com/fastai/fastai/issues/3747))
+
+### Bugs Squashed
+
+- IntToFloatTensor failing on Mac mps due to missing op ([#3761](https://github.com/fastai/fastai/issues/3761))
+- fix for pretrained in vision.learner ([#3746](https://github.com/fastai/fastai/pull/3746)), thanks to [@peterdudfield](https://github.com/peterdudfield)
+- fix same file error message when resizing image ([#3743](https://github.com/fastai/fastai/pull/3743)), thanks to [@cvergnes](https://github.com/cvergnes)
+
+
+## 2.7.6
+
+### New Features
+
+- Initial Mac GPU (mps) support ([#3719](https://github.com/fastai/fastai/issues/3719))
+
+
+## 2.7.5
+
+### New Features
+
+- auto-normalize timm models ([#3716](https://github.com/fastai/fastai/issues/3716))
+- PyTorch 1.12 support
+
+
+## 2.7.4
+
+### New Features
+
+- Add `DataBlock.weighted_dataloaders` ([#3706](https://github.com/fastai/fastai/issues/3706))
+
+
+## 2.7.2
+
+### Bugs Squashed
+
+- `PIL.Resampling` only added in v9.1 ([#3699](https://github.com/fastai/fastai/issues/3699))
+
+
+## 2.7.1
+
+### Bugs Squashed
+
+- Update fastcore minimum version
+
+
+## 2.7.0
+
+### Breaking changes
+
+- Distributed training now uses Hugging Face Accelerate, rather than fastai's launcher.
+  Distributed training is now supported in a notebook -- see [this tutorial](https://docs.fast.ai/tutorial.distributed) for details
+
+### New Features
+
+- `resize_images` creates folder structure at `dest` when `recurse=True` ([#3692](https://github.com/fastai/fastai/issues/3692))
+- Integrate nested callable and getcallable ([#3691](https://github.com/fastai/fastai/pull/3691)), thanks to [@muellerzr](https://github.com/muellerzr)
+- workaround pytorch subclass performance bug ([#3682](https://github.com/fastai/fastai/issues/3682))
+- Torch 1.12.0 compatibility ([#3659](https://github.com/fastai/fastai/pull/3659)), thanks to [@josiahls](https://github.com/josiahls)
+- Integrate Accelerate into fastai ([#3646](https://github.com/fastai/fastai/pull/3646)), thanks to [@muellerzr](https://github.com/muellerzr)
+- New Callback event, before and after backward ([#3644](https://github.com/fastai/fastai/pull/3644)), thanks to [@muellerzr](https://github.com/muellerzr)
+- Let optimizer use built torch opt ([#3642](https://github.com/fastai/fastai/pull/3642)), thanks to [@muellerzr](https://github.com/muellerzr)
+- Support PyTorch Dataloaders with `DistributedDL` ([#3637](https://github.com/fastai/fastai/pull/3637)), thanks to [@tmabraham](https://github.com/tmabraham)
+- Add `channels_last` cb ([#3634](https://github.com/fastai/fastai/pull/3634)), thanks to [@tcapelle](https://github.com/tcapelle)
+- support all timm kwargs ([#3631](https://github.com/fastai/fastai/issues/3631))
+- send `self.loss_func` to device if it is an insatnce on nn.Module ([#3395](https://github.com/fastai/fastai/pull/3395)), thanks to [@arampacha](https://github.com/arampacha)
+- adds tracking and logging best metrics to wandb cb ([#3372](https://github.com/fastai/fastai/pull/3372)), thanks to [@arampacha](https://github.com/arampacha)
+
+### Bugs Squashed
+
+- Solve hanging `load_model` and let LRFind be ran in a distributed setup ([#3689](https://github.com/fastai/fastai/pull/3689)), thanks to [@muellerzr](https://github.com/muellerzr)
+- pytorch subclass functions fail if no positional args ([#3687](https://github.com/fastai/fastai/issues/3687))
+- Workaround for performance bug in PyTorch with subclassed tensors ([#3683](https://github.com/fastai/fastai/pull/3683)), thanks to [@warner-benjamin](https://github.com/warner-benjamin)
+- Fix `Tokenizer.get_lengths` ([#3667](https://github.com/fastai/fastai/pull/3667)), thanks to [@karotchykau](https://github.com/karotchykau)
+- `load_learner` with `cpu=False` doesn't respect the current cuda device if model exported on another; fixes #3656 ([#3657](https://github.com/fastai/fastai/pull/3657)), thanks to [@ohmeow](https://github.com/ohmeow)
+- [Bugfix] Fix smoothloss on distributed ([#3643](https://github.com/fastai/fastai/pull/3643)), thanks to [@muellerzr](https://github.com/muellerzr)
+- WandbCallback Error: "Tensors must be CUDA and dense" on distributed training ([#3291](https://github.com/fastai/fastai/issues/3291))
+- vision tutorial failed at `learner.fine_tune(1)` ([#3283](https://github.com/fastai/fastai/issues/3283))
+
 
 ## 2.6.3
 

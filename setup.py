@@ -31,7 +31,7 @@ if cfg.get('requirements'): requirements += cfg.get('requirements','').split()
 if cfg.get('pip_requirements'): requirements += cfg.get('pip_requirements','').split()
 dev_requirements = (cfg.get('dev_requirements') or '').split()
 
-long_description = open('README.md').read()
+long_description = open('README.md', encoding='utf8').read()
 # ![png](docs/images/output_13_0.png)
 for ext in ['png', 'svg']:
     long_description = re.sub(r'!\['+ext+'\]\((.*)\)', '!['+ext+']('+'https://raw.githubusercontent.com/{}/{}'.format(cfg['user'],cfg['lib_name'])+'/'+cfg['branch']+'/\\1)', long_description)
@@ -55,5 +55,9 @@ setuptools.setup(
     long_description = long_description,
     long_description_content_type = 'text/markdown',
     zip_safe = False,
-    entry_points = { 'console_scripts': cfg.get('console_scripts','').split() },
+    entry_points = {
+        'console_scripts': cfg.get('console_scripts','').split(),
+        'nbdev': [f'{cfg.get("lib_path")}={cfg.get("lib_path")}._modidx:d']
+    },
     **setup_cfg)
+
