@@ -179,7 +179,10 @@ class TfmdDL(DataLoader):
     ):
         self.device = device
         for tfm in self.after_batch.fs:
-            for a in L(getattr(tfm, 'parameters', None)): setattr(tfm, a, getattr(tfm, a).to(device))
+            # Check that tfm.to is callable as TabularPandas & transforms set tfm.to as an object
+            if hasattr(tfm, 'to') and callable(tfm.to): tfm.to(device)
+            else:
+                for a in L(getattr(tfm, 'parameters', None)): setattr(tfm, a, getattr(tfm, a).to(device))
         return self
 
 # %% ../../nbs/03_data.core.ipynb 16
@@ -203,7 +206,7 @@ class DataLoaders(GetAttr):
         device=None # Device to put `DataLoaders`
     ):
         self.loaders,self.path = list(loaders),Path(path)
-        if device is not None or hasattr(loaders[0],'to'): self.device = device
+        if device is not None and (loaders!=() and hasattr(loaders[0],'to')): self.device = device
 
     def __getitem__(self, i): return self.loaders[i]
     def __len__(self): return len(self.loaders)

@@ -207,6 +207,11 @@ class Learner(GetAttr):
     def _backward(self): self.loss_grad.backward()
     def _step(self): self.opt.step()
 
+    def _do_grad_opt(self):
+        self._with_events(self._backward, 'backward', CancelBackwardException)
+        self._with_events(self._step, 'step', CancelStepException)
+        self.opt.zero_grad()
+
     def _do_one_batch(self):
         self.pred = self.model(*self.xb)
         self('after_pred')
@@ -215,9 +220,7 @@ class Learner(GetAttr):
             self.loss = self.loss_grad.clone()
         self('after_loss')
         if not self.training or not len(self.yb): return
-        self._with_events(self._backward, 'backward', CancelBackwardException)
-        self._with_events(self._step, 'step', CancelStepException)
-        self.opt.zero_grad()
+        self._do_grad_opt()
 
     def _set_device(self, b):
         model_device = next(self.model.parameters()).device
@@ -413,8 +416,8 @@ def load(self:Learner, file, device=None, **kwargs):
     if device is None and hasattr(self.dls, 'device'): device = self.dls.device
     if self.opt is None: self.create_opt()
     file = join_path_file(file, self.path/self.model_dir, ext='.pth')
+    distrib_barrier()
     load_model(file, self.model, self.opt, device=device, **kwargs)
-    nested_attr(self, "accelerator.wait_for_everyone", noop)()
     return self
 
 # %% ../nbs/13a_learner.ipynb 102
@@ -446,7 +449,8 @@ def load_learner(fname, cpu=True, pickle_module=pickle):
         raise
     if cpu: 
         res.dls.cpu()
-        if hasattr(res, 'mixed_precision'): res = res.to_fp32()
+        if hasattr(res, 'channels_last'): res = res.to_contiguous(to_fp32=True)
+        elif hasattr(res, 'mixed_precision'): res = res.to_fp32()
         elif hasattr(res, 'non_native_mixed_precision'): res = res.to_non_native_fp32()
     return res
 
