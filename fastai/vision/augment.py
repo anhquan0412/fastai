@@ -557,7 +557,8 @@ def mask_tensor(
     if p==1.: return x
     if batch: return x if random.random() < p else x.new_zeros(*x.size()) + neutral
     if neutral != 0: x.add_(-neutral)
-    mask = x.new_empty(*x.size()).bernoulli_(p)
+    # Extra casting to float and long to prevent crashes on mps accelerator (issue #3911)
+    mask = x.new_empty(*x.size()).float().bernoulli_(p).long()
     x.mul_(mask)
     return x.add_(neutral) if neutral != 0 else x
 
@@ -812,14 +813,8 @@ class Zoom(AffineCoordTfm):
         super().__init__(aff_fs, size=size, mode=mode, pad_mode=pad_mode, align_corners=align_corners)
 
 # %% ../../nbs/09_vision.augment.ipynb 178
-def _linalg_solve(A,B):
+def solve(A,B):
     return torch.linalg.solve(A,B)
-
-def _solve(A,B):
-    return torch.solve(B,A)[0]
-
-if ismin_torch('1.9'): solve = _linalg_solve
-else: solve = _solve
 
 # %% ../../nbs/09_vision.augment.ipynb 179
 def find_coeffs(
