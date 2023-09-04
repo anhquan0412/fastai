@@ -40,7 +40,7 @@ jobs:
       with:
         python-version: ${{ matrix.py }}
     - name: checkout contents of PR
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install libraries
       run: |
         pip install git+https://github.com/fastai/fastcore.git@master
